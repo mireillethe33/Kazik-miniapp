@@ -7,7 +7,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, W
 
 TOKEN = os.environ["8944919667:AAGmiAACDftIDM69XxWN-qiRbjOgTNHuhVk"]
 ADMINS = {int(x) for x in os.environ["7733792615"].split(",")}
-URL = os.environ["https://temp.example.com"]
+URL = os.environ["https://kazik-miniapp-2.onrender.com"]
 PORT = int(os.environ.get("PORT", 8080))
 
 db = sqlite3.connect("casino.db", check_same_thread=False)
