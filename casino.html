@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Lucky Royale</title>
+<style>
+:root{color-scheme:dark;--g:#0b3d2e;--gold:#f5c542;--bg:#07140f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{margin:0}body{background:radial-gradient(circle at 50% 0,#14604a,var(--bg) 70%) fixed;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh;overflow-x:hidden}
+.chip{position:fixed;width:64px;height:64px;border-radius:50%;border:7px dashed #fff5;display:flex;align-items:center;justify-content:center;font-size:22px;opacity:.2;animation:fl linear infinite;z-index:0;pointer-events:none}
+@keyframes fl{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
+#app{position:relative;z-index:1;max-width:560px;margin:auto;padding:12px}
+h1{margin:4px 0;text-align:center;color:var(--gold);letter-spacing:2px;font-size:22px;text-shadow:0 0 12px #f5c54288}
+.hd{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:8px 0}
+.pill{background:#0008;border:1px solid #f5c54255;border-radius:12px;padding:6px;text-align:center;font-size:12px}
+.pill b{display:block;font-size:14px;color:var(--gold)}
+#fx{font-size:12px;min-height:18px;text-align:center;color:#9fe;margin-bottom:4px}
+.tabs{display:flex;gap:4px;overflow-x:auto}.tabs button{flex:1;white-space:nowrap}
+button{font:inherit;color:#fff;background:#1a5c46;border:1px solid #f5c54266;border-radius:10px;padding:9px 10px;cursor:pointer}
+button.on,.go{background:linear-gradient(#f5c542,#c98f0a);color:#222;font-weight:700}
+button:disabled{opacity:.4}
+.panel{background:#0007;border:1px solid #f5c54244;border-radius:16px;padding:12px;margin-top:8px;backdrop-filter:blur(3px)}
+.row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:6px 0}
+input{font:inherit;background:#000a;color:#fff;border:1px solid #f5c54277;border-radius:10px;padding:9px;width:100%}
+.big{font-size:54px;text-align:center;min-height:70px;font-weight:800}
+#res{text-align:center;min-height:22px;color:var(--gold);font-weight:600}
+.r{background:#b3202a}.k{background:#222}.gr{background:#1a8a3a}
+.cd{display:inline-block;background:#fff;color:#111;border-radius:6px;padding:8px 6px;margin:2px;font-weight:700;min-width:36px;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.grid button{aspect-ratio:1;font-size:22px;padding:0}
+#rkw{height:180px;position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(#050a1a,#12306a)}
+#rk{position:absolute;left:calc(50% - 20px);bottom:10px;font-size:40px;transition:transform .06s}
+#rm{position:absolute;top:8px;width:100%;text-align:center;font-size:34px;font-weight:800}
+.modal{position:fixed;inset:0;background:#000c;z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
+.box{background:#0c2b21;border:2px solid var(--gold);border-radius:16px;padding:14px;max-width:520px;width:100%;max-height:88vh;overflow:auto}
+.it{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #fff2;padding:7px 0;font-size:13px}.it small{color:#aaa;display:block}
+#eye{position:fixed;top:0;right:0;width:30%;height:100%;background:#000;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:12px;color:#555}
+#toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:#000d;border:1px solid var(--gold);border-radius:20px;padding:8px 14px;z-index:70;display:none;font-size:13px}
+a{color:var(--gold);font-weight:700}
+</style></head><body>
+<div id="bgc"></div><div id="eye">👁<br>глаз продан</div>
+<div id="app"><h1>🎰 LUCKY ROYALE</h1><div id="hi" style="text-align:center;font-size:12px;color:#9fe"></div>
+<div class="hd"><div class="pill">Баланс<b id="bal"></b></div><div class="pill">🏆 Поб.валюта<b id="wc"></b></div><div class="pill">Удача<b id="lk"></b></div><div class="pill">Макс. ставка<b id="mx"></b></div></div>
+<div id="fx"></div>
+<div class="tabs" id="tabs"></div>
+<div class="panel"><div class="row" style="margin-top:0"><input id="bet" type="number" value="50" min="10" inputmode="numeric" style="flex:1;min-width:90px"><button onclick="qb(.5)">½</button><button onclick="qb(2)">×2</button><button onclick="qb(0)">MAX</button></div>
+<div id="g"></div><div id="res"></div></div>
+<div class="row"><button onclick="openShop()">🛒 Магазин</button></div></div>
+
+<div class="modal" id="shop"><div class="box"><h3 style="margin-top:0;color:var(--gold)">🛒 Магазин (за 🏆 победную валюту)</h3><div id="sl"></div><button style="width:100%;margin-top:10px" onclick="cl('shop')">Закрыть</button></div></div>
+<div class="modal" id="con"><div class="box"><h3 style="margin-top:0;color:var(--gold)">⌨ Консоль</h3><div id="log">/help — список команд</div><input id="ci" placeholder="/give money 1000" autocomplete="off"><button class="go" style="width:100%;margin-top:8px" onclick="cmd()">Выполнить</button><button style="width:100%;margin-top:6px" onclick="cl('con')">Закрыть</button></div></div>
+<div class="modal" id="broke" style="z-index:65"><div class="box" style="text-align:center"><div style="font-size:50px">💸</div><h3 style="color:var(--gold)">Ты всё проиграл!</h3><p>Напишите владельцу <b>@shiza_88</b> для того, чтобы купить валюту.</p><p><a href="https://t.me/shiza_88" target="_blank" rel="noopener">t.me/shiza_88</a></p><button style="width:100%" onclick="cl('broke');openShop()">Продать глаз/руку в магазине</button><button style="width:100%;margin-top:6px" onclick="cl('broke')">Закрыть</button></div></div>
+<div class="modal" id="ban" style="z-index:99"><div class="box" style="text-align:center"><div style="font-size:50px">🚫</div><h3 style="color:var(--gold)">Вы забанены</h3><p>Доступ закрыт администратором.<br>Вопросы: <a href="https://t.me/shiza_88" target="_blank" rel="noopener">@shiza_88</a></p></div></div><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),RED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+let TG={id:0,name:''};
+try{const q=new URLSearchParams(location.hash.slice(1)),d=new URLSearchParams(q.get('tgWebAppData')||''),u=JSON.parse(d.get('user')||'null');if(u){TG.id=u.id;TG.name=u.first_name||u.username||''}
+const px=window.TelegramWebviewProxy;if(px){px.postEvent('web_app_ready','{}');px.postEvent('web_app_expand','{}');px.postEvent('web_app_set_header_color','{"color":"#07140f"}')}}catch(e){}
+const SK='lr1_'+TG.id;
+let S={bal:1000,wc:0,ban:0,luck:0,betLv:0,sh:0,dbl:0,ins:0,boostU:0,shU:0,eye:0,hand:0,adm:0},act=0,cur='rl';
+try{Object.assign(S,JSON.parse(localStorage.getItem(SK)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}};
+const now=()=>Date.now(),maxBet=()=>{let m=100+S.betLv*100;return S.hand?Math.floor(m/2):m},luckV=()=>S.luck*.5+(now()<S.boostU?5:0),retry=()=>Math.random()*100<luckV(),R=n=>Math.floor(Math.random()*n);
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e.t);e.t=setTimeout(()=>e.style.display='none',2200)};
+const cl=id=>$('#'+id).style.display='none',op=id=>$('#'+id).style.display='flex';
+for(let i=0;i<14;i++){const c=document.createElement('div');c.className='chip';c.style.cssText=`left:${R(95)}%;background:radial-gradient(circle,hsl(${R(360)} 70% 40%) 55%,#fff3 56%);animation-duration:${14+R(16)}s;animation-delay:-${R(20)}s`;c.textContent='♠♥♦♣'[R(4)];$('#bgc').appendChild(c)}
+function render(){$('#bal').textContent=S.bal.toLocaleString()+' 💰';$('#wc').textContent=S.wc;$('#lk').textContent=luckV().toFixed(1)+'%';$('#mx').textContent=maxBet();$('#eye').style.display=S.eye?'flex':'none';
+let f=[];if(now()<S.shU)f.push(`🛡 ${Math.ceil((S.shU-now())/1000)}с`);if(now()<S.boostU)f.push(`🍀 ${Math.ceil((S.boostU-now())/1000)}с`);if(S.dbl)f.push('✖2 ×'+S.dbl);if(S.ins)f.push('🪂 ×'+S.ins);if(S.sh&&now()>=S.shU)f.push(`<button onclick="actSh()" style="padding:2px 8px">🛡 включить (${S.sh})</button>`);if(S.hand)f.push('🖐 нет руки');
+$('#fx').innerHTML=f.join(' · ');if(S.bal<10&&!act&&$('#broke').style.display!='flex')op('broke')}
+setInterval(render,500);
+function actSh(){if(S.sh>0&&now()>=S.shU){S.sh--;S.shU=now()+30000;toast('🛡 Щит активен 30с');save();render()}}
+function gb(){const v=Math.floor(+$('#bet').value);if(!(v>=10))return toast('Мин. ставка 10'),0;if(v>maxBet())return toast('Макс. ставка '+maxBet()),0;if(v>S.bal)return toast('Недостаточно денег'),0;return v}
+function qb(x){let v=+$('#bet').value||10;$('#bet').value=x?Math.max(10,Math.min(Math.floor(v*x),maxBet(),S.bal)):Math.max(10,Math.min(maxBet(),S.bal))}
+function fin(b,m){let t='',tot=Math.floor(b*m),pr=tot-b;if(m>0){if(pr>0&&S.dbl>0){S.dbl--;tot+=pr;t='✖2 бонус! '}if(pr>0)S.wc+=100;S.bal+=tot;t+=pr>0?`Выигрыш +${tot-b} 💰 · +100 🏆`:'Возврат ставки'}else if(now()<S.shU){S.bal+=b;t='Проигрыш, но 🛡 вернул ставку'}else if(S.ins>0){S.ins--;S.bal+=Math.floor(b/2);t='Проигрыш, 🪂 вернул 50%'}else t=`Проигрыш −${b}`;
+$('#res').textContent=t;act=0;save();render()}
+const T=[['rl','🎡 Рулетка'],['sl','🎰 Слоты'],['rk','🚀 Ракета'],['mn','💣 Мины'],['bj','🃏 Блэкджек']];
+$('#tabs').innerHTML=T.map(t=>`<button id="t_${t[0]}" onclick="show('${t[0]}')">${t[1]}</button>`).join('');
+function show(n){if(act)return toast('Заверши раунд');cur=n;T.forEach(t=>$('#t_'+t[0]).classList.toggle('on',t[0]==n));$('#res').textContent='';
+const H={rl:`<div id="wh" class="big">🎡</div><div class="row"><button class="r" onclick="rl('r')">Красное ×2</button><button class="k" onclick="rl('k')">Чёрное ×2</button><button class="gr" onclick="rl('g')">Зеро ×14</button></div>`,
+sl:`<div id="rs" class="big">🎰🎰🎰</div><div class="row"><button class="go" style="width:70%" onclick="sl()">КРУТИТЬ</button></div><div style="font-size:12px;text-align:center;color:#aaa">3 одинаковых ×10 (7️⃣ ×25) · пара ×1.5</div>`,
+rk:`<div id="rkw"><div id="rm">1.00×</div><div id="rk">🚀</div></div><div class="row"><button class="go" id="rb" style="width:70%" onclick="rkBtn()">СТАРТ</button></div>`,
+mn:`<div class="grid" id="mg">${Array.from({length:25},(_,i)=>`<button onclick="mt(${i})">?</button>`).join('')}</div><div class="row"><button class="go" id="mb" style="width:70%" onclick="mnBtn()">СТАРТ (3 мины)</button></div>`,
+bj:`<div style="font-size:12px;color:#aaa">Дилер</div><div id="bd" class="big" style="font-size:24px;min-height:50px"></div><div style="font-size:12px;color:#aaa">Ты</div><div id="bp" class="big" style="font-size:24px;min-height:50px"></div><div class="row" id="b1"><button class="go" style="width:70%" onclick="bjGo()">РАЗДАТЬ</button></div><div class="row" id="b2" hidden><button onclick="bjHit()">Ещё</button><button class="go" onclick="bjStand()">Хватит</button><button id="bdbl" onclick="bjDbl()">×2 Удвоить</button></div>`};
+$('#g').innerHTML=H[n]}
+// Рулетка
+const r37=()=>R(37),ncol=n=>n+(n==0?'🟢':RED.includes(n)?'🔴':'⚫');
+function rl(c){if(act)return;const b=gb();if(!b)return;S.bal-=b;act=1;render();let i=0;const iv=setInterval(()=>{$('#wh').textContent=ncol(r37());if(++i>16){clearInterval(iv);const w=x=>c=='g'?x==0:(x>0&&RED.includes(x)==(c=='r'));let n=r37();if(!w(n)&&retry())n=r37();$('#wh').textContent=ncol(n);fin(b,w(n)?(c=='g'?14:2):0)}},70)}
+// Слоты
+const SY=['🍒','🍋','🔔','🍇','💎','7️⃣'];
+function sl(){if(act)return;const b=gb();if(!b)return;S.bal-=b;act=1;render();let i=0;const iv=setInterval(()=>{$('#rs').textContent=[0,0,0].map(()=>SY[R(6)]).join('');if(++i>14){clearInterval(iv);const roll=()=>[R(6),R(6),R(6)],mu=a=>a[0]==a[1]&&a[1]==a[2]?(a[0]==5?25:10):(a[0]==a[1]||a[1]==a[2]||a[0]==a[2]?1.5:0);let a=roll();if(!mu(a)&&retry())a=roll();$('#rs').textContent=a.map(x=>SY[x]).join('');fin(b,mu(a))}},80)}
+// Ракета
+let rk=0,rkIv;
+function rkBtn(){if(!rk){const b=gb();if(!b)return;S.bal-=b;act=1;render();rk={b,m:1,cr:Math.min(1000,Math.max(1.01,.96/(1-Math.random())))*(1+luckV()/100)};$('#rb').textContent='ЗАБРАТЬ';$('#rk').textContent='🚀';
+rkIv=setInterval(()=>{rk.m*=1.012;if(rk.m>=rk.cr){clearInterval(rkIv);$('#rm').textContent='💥 '+rk.cr.toFixed(2)+'×';$('#rk').textContent='💥';const b=rk.b;rk=0;$('#rb').textContent='СТАРТ';fin(b,0)}else{$('#rm').textContent=rk.m.toFixed(2)+'×';$('#rk').style.transform=`translateY(${-Math.min(110,Math.log(rk.m)*55)}px)`}},50)}
+else{clearInterval(rkIv);const{b,m}=rk;rk=0;$('#rb').textContent='СТАРТ';$('#rk').style.transform='';fin(b,m)}}
+// Мины
+let mn=0;const mm=k=>{let m=.97;for(let i=0;i<k;i++)m*=(25-i)/(22-i);return m},mb=()=>$('#mg').children;
+function mnBtn(){if(!mn){const b=gb();if(!b)return;S.bal-=b;act=1;render();const ms=new Set;while(ms.size<3)ms.add(R(25));mn={b,ms,op:new Set};[...mb()].forEach(e=>e.textContent='?');$('#mb').textContent='Забрать ×1.00'}else if(mn.op.size)mnEnd(1)}
+function mnEnd(w){const{b,op}=mn,k=op.size;[...mb()].forEach((e,i)=>{if(mn.ms.has(i))e.textContent='💣'});mn=0;$('#mb').textContent='СТАРТ (3 мины)';fin(b,w?mm(k):0)}
+function mt(i){if(!mn||mn.op.has(i))return;if(mn.ms.has(i)){if(retry()){mn.ms.delete(i);let j;do j=R(25);while(j==i||mn.ms.has(j)||mn.op.has(j));mn.ms.add(j)}else{mb()[i].textContent='💥';return mnEnd(0)}}
+mn.op.add(i);mb()[i].textContent='💎';$('#mb').textContent='Забрать ×'+mm(mn.op.size).toFixed(2);if(mn.op.size==22)mnEnd(1)}
+// Блэкджек
+let bj=0;const cv=c=>Math.min(c,10),hv=h=>{let s=h.reduce((a,c)=>a+cv(c),0);return h.includes(1)&&s+10<=21?s+10:s},cn=c=>c==1?'A':c>10?'JQK'[c-11]:c,cd=()=>1+R(13),hs=(h,hide)=>h.map((c,i)=>hide&&i==1?'<span class="cd">?</span>':`<span class="cd">${cn(c)}♥</span>`).join('')+(hide?'':' = '+hv(h));
+function bjR(hide){$('#bdbl').hidden=bj.p.length>2;$('#bd').innerHTML=hs(bj.d,hide);$('#bp').innerHTML=hs(bj.p)}
+function bjGo(){if(act)return;const b=gb();if(!b)return;S.bal-=b;act=1;render();bj={b,p:[cd(),cd()],d:[cd(),cd()]};$('#res').textContent='';
+if(hv(bj.p)==21){bjR(0);const m=hv(bj.d)==21?1:2.5,b2=bj.b;bj=0;return fin(b2,m)}bjR(1);$('#b1').hidden=1;$('#b2').hidden=0}
+function bjEnd(m){const b=bj.b;bj=0;$('#b1').hidden=0;$('#b2').hidden=1;fin(b,m)}
+function bjHit(){if(!bj)return;bj.p.push(cd());if(hv(bj.p)>21&&retry())bj.p[bj.p.length-1]=cd();if(hv(bj.p)>21){bjR(0);return bjEnd(0)}bjR(1);if(hv(bj.p)==21)bjStand()}
+function bjDbl(){if(!bj||bj.p.length!=2)return;if(S.bal<bj.b)return toast('Не хватает денег для удвоения');S.bal-=bj.b;bj.b*=2;bj.p.push(cd());if(hv(bj.p)>21&&retry())bj.p[2]=cd();if(hv(bj.p)>21){bjR(0);return bjEnd(0)}bjStand()}
+function bjStand(){if(!bj)return;while(hv(bj.d)<17)bj.d.push(cd());bjR(0);const p=hv(bj.p),d=hv(bj.d);bjEnd(d>21||p>d?2:p==d?1:0)}
+// Магазин
+const P=()=>[
+{n:'🛡 Щит',d:'Отключает убыток от поражений на 30с (1 раз). Включить в панели сверху',p:200,f:()=>S.sh++,c:()=>S.sh},
+{n:'✖2 Удвоитель',d:'Следующий выигрыш — прибыль ×2',p:300,f:()=>S.dbl++,c:()=>S.dbl},
+{n:'🪂 Страховка',d:'Следующий проигрыш вернёт 50% ставки',p:150,f:()=>S.ins++,c:()=>S.ins},
+{n:'🍀 Лаки-буст',d:'+5% удачи на 60 секунд',p:500,f:()=>S.boostU=Math.max(now(),S.boostU)+60000},
+{n:'📈 Апгрейд ставок',d:`Макс. ставка +100 (ур. ${S.betLv})`,p:300*(S.betLv+1),f:()=>S.betLv++},
+{n:'⭐ Апгрейд удачи',d:`+0.5% удачи (ур. ${S.luck}/40)`,p:500*(S.luck+1),f:()=>S.luck++,x:S.luck>=40}];
+function openShop(){let h=P().map((x,i)=>`<div class="it"><div><b>${x.n}</b><small>${x.d}</small></div><button ${x.x||S.wc<x.p?'disabled':''} onclick="buy(${i})">${x.x?'MAX':x.p+' 🏆'}</button></div>`).join('');
+h+=`<div class="it"><div><b>👁 Продать глаз</b><small>+5000 💰. Правая часть экрана (30%) закрыта навсегда</small></div><button ${S.eye?'disabled':''} onclick="sell('eye',5000)">${S.eye?'Продан':'Продать'}</button></div><div class="it"><div><b>🖐 Продать руку</b><small>+3000 💰. Макс. ставка в 2 раза меньше</small></div><button ${S.hand?'disabled':''} onclick="sell('hand',3000)">${S.hand?'Продана':'Продать'}</button></div>`;
+$('#sl').innerHTML=h;op('shop')}
+function buy(i){const x=P()[i];if(S.wc<x.p||x.x)return;S.wc-=x.p;x.f();save();render();openShop();toast('Куплено: '+x.n)}
+function sell(k,v){S[k]=1;S.bal+=v;save();render();openShop();toast('Продано! +'+v)}
+const INIT=new URLSearchParams(location.hash.slice(1)).get('tgWebAppData')||'';
+async function api(st){try{const r=await fetch('/api/sync',{method:'POST',headers:{'Content-Type':'application/json','X-Init':INIT},body:JSON.stringify({st})});return r.ok?await r.json():null}catch(e){return null}}
+function applyG(g){const n=g.n||1;({money:()=>S.bal+=n,wc:()=>S.wc+=n,shield:()=>S.sh+=n,double:()=>S.dbl+=n,insure:()=>S.ins+=n,boost:()=>S.boostU=Math.max(now(),S.boostU)+60000*n,betup:()=>S.betLv+=n,luckup:()=>S.luck=Math.min(40,S.luck+n),eye:()=>S.eye=0,hand:()=>S.hand=0,reset:()=>Object.assign(S,{bal:1000,wc:0,luck:0,betLv:0,sh:0,dbl:0,ins:0,boostU:0,shU:0,eye:0,hand:0})})[g.item]?.()}
+async function sync(first){if(act&&!first)return;const r=await api(first?null:S);if(!r)return;if(first&&r.st)Object.assign(S,r.st);(r.grants||[]).forEach(applyG);if((r.grants||[]).length)toast('🎁 Вам выдали предметы');S.ban=r.ban?1:0;$('#ban').style.display=r.ban?'flex':'none';save();render()}
+if(INIT)sync(1).then(()=>setInterval(()=>sync(0),4000));
+if(TG.name)$('#hi').textContent='👋 '+TG.name;show('rl');render();
+</script></body></html>
